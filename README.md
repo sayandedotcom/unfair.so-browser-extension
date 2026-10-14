@@ -28,3 +28,23 @@ node --test
 - [ ] Open DevTools on another tab and capture: still works. (To test `ATTACH_FAILED`, it's enough to confirm the error text is readable if it ever occurs.)
 - [ ] Charts blank in the screenshot? Increase `SETTLE_MS` in `lib.js` (default 1500).
 - [ ] Popup opened for the first time (clear storage via `chrome.storage.local.clear()` in the service-worker console): shows "No reading yet…" with the dashed Capture box and no broken image.
+
+## Web front-end
+
+A standalone browser page (separate from the extension) where you drop, choose, or paste a screenshot of your X audience page and see it previewed. Nothing is uploaded; it all stays in your browser.
+
+```
+python3 -m http.server 5173 -d web
+```
+
+Then open <http://localhost:5173>.
+
+- Drop an image on the dashed box, click it to choose a file, or paste with Ctrl/Cmd+V. PNG, JPEG and WebP up to 10 MB.
+- **Replace** and **Remove** appear under the preview.
+
+Checks:
+
+```
+node --test                      # unit tests
+node tests/browser-check.mjs     # real-browser checks (needs Chrome); screenshots go to $SHOT_DIR
+```
