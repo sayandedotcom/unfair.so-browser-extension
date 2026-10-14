@@ -3,7 +3,7 @@ importScripts('lib.js');
 const {
   ANALYTICS_URL, VIEWPORT, LOAD_TIMEOUT_MS, SETTLE_MS,
   FRONTEND_URL, FRONTEND_MATCH,
-  CaptureError, isLoginUrl, isAnalyticsUrl, computeClip, errorMessage,
+  CaptureError, isLoginUrl, isAnalyticsUrl, computeClip, chooseViewport, errorMessage,
 } = self.XLib;
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -28,6 +28,8 @@ async function captureAudience(report) {
 
   try {
     report('Opening X analytics page…');
+    const [current] = await chrome.tabs.query({ active: true, lastFocusedWindow: true }).catch(() => []);
+    const viewport = chooseViewport(current);
     tab = await chrome.tabs.create({ url: 'about:blank', active: false });
     target = { tabId: tab.id };
 
@@ -50,7 +52,7 @@ async function captureAudience(report) {
     await send('Page.enable');
     await send('Page.setLifecycleEventsEnabled', { enabled: true });
     await send('Emulation.setDeviceMetricsOverride', {
-      width: VIEWPORT.width, height: VIEWPORT.height, deviceScaleFactor: 1, mobile: false,
+      width: viewport.width, height: viewport.height, deviceScaleFactor: 1, mobile: false,
     });
     await send('Emulation.setFocusEmulationEnabled', { enabled: true });
 
@@ -70,7 +72,7 @@ async function captureAudience(report) {
 
     report('Capturing screenshot…');
     const metrics = await send('Page.getLayoutMetrics');
-    const clip = computeClip(metrics.cssContentSize || metrics.contentSize, VIEWPORT);
+    const clip = computeClip(metrics.cssContentSize || metrics.contentSize, viewport);
     const shot = await send('Page.captureScreenshot', {
       format: 'png', captureBeyondViewport: true, clip,
     });

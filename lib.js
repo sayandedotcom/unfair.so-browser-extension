@@ -65,6 +65,19 @@
     return { x: 0, y: 0, width, height, scale: 1 };
   }
 
+  // Capture at the size of the user's current tab so X renders the same layout they see
+  // (X switches to a compact layout on narrower viewports). Falls back to VIEWPORT.
+  function chooseViewport(tab) {
+    const pick = (n, lo, hi, fallback) => {
+      const v = Number(n);
+      return Number.isFinite(v) && v > 0 ? Math.min(hi, Math.max(lo, Math.round(v))) : fallback;
+    };
+    return {
+      width: pick(tab && tab.width, 1280, 2560, VIEWPORT.width),
+      height: pick(tab && tab.height, 600, 1600, VIEWPORT.height),
+    };
+  }
+
   function captureFilename(date) {
     const d = date instanceof Date && !Number.isNaN(date.getTime()) ? date : new Date();
     const stamp = d.toISOString().replace(/\.\d+Z$/, 'Z').replace(/:/g, '-');
@@ -79,7 +92,7 @@
   const api = {
     ANALYTICS_URL, VIEWPORT, MAX_CAPTURE_HEIGHT, LOAD_TIMEOUT_MS, SETTLE_MS,
     FRONTEND_URL, FRONTEND_MATCH, ERROR_MESSAGES, CaptureError,
-    isLoginUrl, isAnalyticsUrl, computeClip, captureFilename, errorMessage,
+    isLoginUrl, isAnalyticsUrl, computeClip, chooseViewport, captureFilename, errorMessage,
   };
 
   if (typeof module === 'object' && module.exports) {
