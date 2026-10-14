@@ -6,6 +6,24 @@ const {
   CaptureError, isLoginUrl, isAnalyticsUrl, computeClip, chooseViewport, errorMessage,
 } = self.XLib;
 
+// Scrolls whatever scrolls (the page, or X's biggest inner scroll container) all the way down.
+const SCROLL_TO_BOTTOM = `(() => {
+  const doc = document.scrollingElement || document.documentElement;
+  let el = doc;
+  if (doc.scrollHeight <= window.innerHeight + 5) {
+    let bestHeight = 0;
+    for (const node of document.querySelectorAll('*')) {
+      const overflowY = getComputedStyle(node).overflowY;
+      if ((overflowY === 'auto' || overflowY === 'scroll') && node.scrollHeight > node.clientHeight + 5 && node.clientHeight > bestHeight) {
+        el = node;
+        bestHeight = node.clientHeight;
+      }
+    }
+  }
+  el.scrollTo(0, el.scrollHeight);
+  return { max: el.scrollHeight - el.clientHeight, top: el.scrollTop };
+})()`;
+
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 async function waitUntil(predicate, timeoutMs, intervalMs = 100) {
@@ -17,8 +35,8 @@ async function waitUntil(predicate, timeoutMs, intervalMs = 100) {
   return predicate();
 }
 
-// Opens the analytics page in an inactive tab, screenshots it over CDP,
-// and returns a PNG data URL. Always closes the tab and detaches the debugger.
+// Opens the analytics page in an inactive tab, screenshots it over CDP, then scrolls to the bottom and
+// screenshots again. Returns { dataUrl, scrolledDataUrl } (PNG data URLs; the second is null if the page can't scroll). Always closes the tab and detaches the debugger.
 async function captureAudience(report) {
   let tab = null;
   let target = null;
@@ -76,7 +94,23 @@ async function captureAudience(report) {
     const shot = await send('Page.captureScreenshot', {
       format: 'png', captureBeyondViewport: true, clip,
     });
-    return 'data:image/png;base64,' + shot.data;
+    const dataUrl = 'data:image/png;base64,' + shot.data;
+
+    // Second screenshot: scroll as far down as the page goes, give lazy content a moment, capture the viewport.
+    report('Scrolling to the bottom…');
+    let scrolledDataUrl = null;
+    try {
+      const scroll = await send('Runtime.evaluate', { expression: SCROLL_TO_BOTTOM, returnByValue: true });
+      const info = scroll.result && scroll.result.value;
+      if (info && info.max > 0) {
+        await sleep(1200);
+        const bottom = await send('Page.captureScreenshot', { format: 'png' });
+        scrolledDataUrl = 'data:image/png;base64,' + bottom.data;
+      }
+    } catch {
+      /* the first screenshot is still good */
+    }
+    return { dataUrl, scrolledDataUrl };
   } catch (e) {
     if (e instanceof CaptureError) throw e;
     throw new CaptureError('CAPTURE_FAILED', e && e.message);
@@ -130,8 +164,8 @@ chrome.runtime.onConnect.addListener((port) => {
     busy = true;
     await setCapturing(true);
     try {
-      const dataUrl = await captureAudience((text) => post(port, { type: 'status', text }));
-      const capture = { dataUrl, capturedAt: new Date().toISOString() };
+      const { dataUrl, scrolledDataUrl } = await captureAudience((text) => post(port, { type: 'status', text }));
+      const capture = { dataUrl, scrolledDataUrl, capturedAt: new Date().toISOString() };
       // A failed save must not discard a capture that succeeded.
       let saved = true;
       try {

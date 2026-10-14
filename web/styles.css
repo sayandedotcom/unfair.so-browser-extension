@@ -81,6 +81,8 @@ h1 { margin: 0 0 12px; font-size: 18px; font-weight: 650; }
 .placeholder-hint { color: var(--faint); font-size: 14px; }
 
 figure { margin: 0; }
+.shot-label { margin: 0 0 6px; color: var(--muted); font-size: 13px; font-weight: 600; }
+#scrolledWrap { margin-top: 16px; }
 .frame {
   max-height: 420px;
   overflow: auto;

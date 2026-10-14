@@ -3,7 +3,7 @@
   const $ = (id) => document.getElementById(id);
   const els = {
     status: $('status'), placeholder: $('placeholder'), preview: $('preview'),
-    shot: $('shot'), meta: $('meta'), capture: $('placeholder'), recapture: $('recapture'),
+    shot: $('shot'), shotScrolled: $('shotScrolled'), scrolledWrap: $('scrolledWrap'), meta: $('meta'), capture: $('placeholder'), recapture: $('recapture'),
   };
   const ORIGIN = window.location.origin;
   let busy = false;
@@ -49,6 +49,9 @@
 
   function show(capture) {
     els.shot.src = capture.dataUrl;
+    els.scrolledWrap.hidden = !capture.scrolledDataUrl;
+    if (capture.scrolledDataUrl) els.shotScrolled.src = capture.scrolledDataUrl;
+    else els.shotScrolled.removeAttribute('src');
     els.meta.textContent = 'Captured ' + formatCapturedAt(capture.capturedAt);
     els.placeholder.hidden = true;
     els.preview.hidden = false;

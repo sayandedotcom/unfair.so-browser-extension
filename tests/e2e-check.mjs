@@ -79,7 +79,7 @@ try {
   if (!sw) throw new Error('extension service worker did not start');
   const swEv = await attach(sw.targetId);
   // Stub only the X screenshot step; everything downstream is the real code path.
-  await swEv(`captureAudience = async () => '${PNG}'; 'stubbed'`);
+  await swEv(`captureAudience = async () => ({ dataUrl: '${PNG}', scrolledDataUrl: '${PNG}' }); 'stubbed'`);
 
   const pressCapture = async () => {
     const { targetId } = await send('Target.createTarget', { url: `chrome-extension://${extId}/popup.html` });
