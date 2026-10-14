@@ -1,0 +1,13 @@
+{
+  "manifest_version": 3,
+  "name": "X Audience Screenshot",
+  "version": "0.1.0",
+  "description": "Screenshot your X audience analytics page and view it in the popup.",
+  "permissions": ["tabs", "debugger", "storage"],
+  "host_permissions": ["https://x.com/*"],
+  "background": { "service_worker": "background.js" },
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Capture X audience analytics"
+  }
+}
