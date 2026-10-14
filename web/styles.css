@@ -98,7 +98,8 @@ figcaption {
   color: var(--faint);
   font-size: 13px;
 }
-.actions { display: inline-flex; gap: 14px; }
+#meta { min-width: 0; overflow-wrap: anywhere; }
+.actions { display: inline-flex; flex-shrink: 0; gap: 14px; }
 button.link {
   padding: 0;
   background: none;

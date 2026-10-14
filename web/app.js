@@ -1,5 +1,5 @@
 (function () {
-  const { validateImage, formatBytes } = window.WebHelpers;
+  const { validateImage, formatBytes, MESSAGES } = window.WebHelpers;
   const $ = (id) => document.getElementById(id);
   const els = {
     status: $('status'), drop: $('drop'), file: $('file'), preview: $('preview'),
@@ -7,6 +7,7 @@
   };
   const LEAD = 'No screenshot yet. Screenshot your X audience page and drop it here.';
   let objectUrl = null;
+  let attempt = 0;
 
   function setStatus(text, isError = false) {
     els.status.textContent = text;
@@ -20,9 +21,9 @@
     }
   }
 
-  function showImage(file) {
+  function showImage(file, url) {
     releaseImage();
-    objectUrl = URL.createObjectURL(file);
+    objectUrl = url;
     els.shot.src = objectUrl;
     els.meta.textContent = `${file.name || 'Pasted image'} · ${formatBytes(file.size)}`;
     els.preview.hidden = false;
@@ -31,6 +32,7 @@
   }
 
   function reset() {
+    attempt++; // an image still being decoded must not appear after Remove
     releaseImage();
     els.shot.removeAttribute('src');
     els.meta.textContent = '';
@@ -41,13 +43,25 @@
     els.drop.focus();
   }
 
+  // The file type comes from the extension, so decode the image before trusting it.
   function accept(file) {
     const result = validateImage(file);
     if (!result.ok) {
       setStatus(result.error, true);
       return;
     }
-    showImage(file);
+    const mine = ++attempt;
+    const url = URL.createObjectURL(file);
+    const probe = new Image();
+    probe.onload = () => {
+      if (mine !== attempt) { URL.revokeObjectURL(url); return; } // superseded by a newer choice
+      showImage(file, url);
+    };
+    probe.onerror = () => {
+      URL.revokeObjectURL(url);
+      if (mine === attempt) setStatus(MESSAGES.unreadable, true);
+    };
+    probe.src = url;
   }
 
   const firstFile = (dt) => (dt && dt.files && dt.files[0]) || null;

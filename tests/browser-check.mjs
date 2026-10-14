@@ -148,6 +148,7 @@ async function behaviourChecks() {
   // Drop a valid PNG -> preview
   let s = await st();
   await ev(`(async () => __t.drop(q('drop'), await __t.png('one.png')))()`, true);
+  await sleep(250); // accepting is async: the image is decoded before it is shown
   s = await st();
   check('drop a PNG shows the preview',
     !s.previewHidden && s.dropHidden && s.src && s.src.startsWith('blob:') && s.status === 'Screenshot ready.' && !s.err, JSON.stringify(s));
@@ -168,6 +169,14 @@ async function behaviourChecks() {
   await ev(`__t.drop(q('preview'), new File([], 'empty.png', { type: 'image/png' }))`);
   s = await st();
   check('empty file: error shown, preview kept', s.err && s.status === 'That file is empty.' && s.src === firstSrc, s.status);
+  // A file that claims to be a PNG but cannot be decoded is rejected like any other bad file
+  await ev(`__t.drop(q('preview'), new File(['this is not really a png'], 'fake.png', { type: 'image/png' }))`);
+  await sleep(250);
+  s = await st();
+  check('corrupt image: error shown, preview kept',
+    s.err && s.status === "That image couldn't be read." && s.src === firstSrc && !s.previewHidden, s.status);
+  check('corrupt image: the kept preview still renders',
+    (await ev(`q('shot').complete && q('shot').naturalWidth > 0`)) === true);
 
   // Review Focus 3: drop outside the target is prevented (no navigation) and ignored
   const outside = await ev(`(async () => __t.drop(document.body, await __t.png('outside.png')))()`, true);
@@ -180,6 +189,7 @@ async function behaviourChecks() {
   // Review Focus 4 + 5: several files -> first only; replace revokes the old URL
   const before = s.revoked;
   await ev(`(async () => __t.drop(q('preview'), await __t.png('two.png'), await __t.png('three.png')))()`, true);
+  await sleep(250);
   s = await st();
   check('several files: only the first is used', /two\.png/.test(s.meta) && !/three\.png/.test(s.meta), s.meta);
   check('replacing revokes the previous object URL', s.revoked === before + 1 && s.src !== firstSrc, `revoked ${before}→${s.revoked}`);
@@ -207,6 +217,7 @@ async function behaviourChecks() {
   await ev(`q('drop').click()`);
   check('clicking the drop zone opens the file picker', (await st()).picker === 2);
   await ev(`(async () => { const f = await __t.png('chosen.png'); q('file').files = __t.dt(f).files; q('file').dispatchEvent(new Event('change', { bubbles: true })); })()`, true);
+  await sleep(250);
   s = await st();
   check('choosing a file shows the preview', !s.previewHidden && /chosen\.png/.test(s.meta), s.meta);
   check('file input cleared so the same file can be chosen again', s.input === '', JSON.stringify(s.input));
@@ -217,12 +228,31 @@ async function behaviourChecks() {
   s = await st();
   check('plain-text paste is ignored (default not prevented)', textPrevented === false && s.meta === metaBefore, s.meta);
   const imgPrevented = await ev(`(async () => __t.paste(__t.dt(await __t.png(''))))()`, true);
+  await sleep(250);
   s = await st();
   check('image paste shows the preview', imgPrevented === true && !s.previewHidden && /Pasted image · \d/.test(s.meta), s.meta);
 
   // Accessibility
   await ev(`q('remove').click()`);
   check('drop zone is a native button (keyboard operable)', (await ev(`q('drop').tagName`)) === 'BUTTON');
+
+  // Corrupt image from the empty state keeps the empty state
+  await ev(`__t.drop(q('drop'), new File(['this is not really a png'], 'fake.png', { type: 'image/png' }))`);
+  await sleep(250);
+  s = await st();
+  check('corrupt image from the empty state: error shown, still empty',
+    s.err && s.status === "That image couldn't be read." && s.previewHidden && !s.dropHidden, s.status);
+
+  // Phone width: a long, space-free file name must not widen the page or push the actions off-screen
+  await cmd('Emulation.setDeviceMetricsOverride', { ...VIEWPORT, width: 375 });
+  await ev(`(async () => __t.drop(q('drop'), await __t.png('Screenshot_2026-10-15_at_02.33.12_X_audience_analytics_followers_full_page_capture.png')))()`, true);
+  await sleep(250);
+  const fit = JSON.parse(await ev(`JSON.stringify({ scrollW: document.documentElement.scrollWidth, innerW: window.innerWidth,
+    removeRight: q('remove').getBoundingClientRect().right })`));
+  check('long file name does not cause horizontal scroll at 375px', fit.scrollW <= fit.innerW, JSON.stringify(fit));
+  check('Replace/Remove stay inside the viewport at 375px', fit.removeRight <= fit.innerW, JSON.stringify(fit));
+  await shot('web-mobile-long.png');
+  await cmd('Emulation.setDeviceMetricsOverride', VIEWPORT);
 }
 
 // --- run -------------------------------------------------------------------

@@ -7,6 +7,7 @@
     notImage: "That file isn't a PNG, JPEG or WebP image.",
     tooLarge: 'That image is over 10 MB. Try a smaller screenshot.',
     empty: 'That file is empty.',
+    unreadable: "That image couldn't be read.",
   };
 
   function validateImage(file) {

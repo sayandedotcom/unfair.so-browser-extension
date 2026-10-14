@@ -29,8 +29,8 @@ Plain HTML, CSS and JS in a `web/` folder. No build step, no dependencies. (Vite
 ## Behaviour
 - **Accepting input:** drop an image onto the zone; click (or Enter/Space when focused) to open the file picker (`accept="image/png,image/jpeg,image/webp"`); paste (Ctrl/Cmd+V) an image from the clipboard anywhere on the page.
 - **Drag feedback:** while an item is dragged over the zone it gets a highlighted border/background; the highlight clears on leave and drop. Dropping a file anywhere else on the page must not navigate the browser away from the page.
-- **Validation (`validateImage`):** accepted types `image/png`, `image/jpeg`, `image/webp`; max size 10 MB (10 * 1024 * 1024 bytes); zero-byte files rejected. A rejected file shows an inline error and leaves the current state (empty or existing preview) unchanged. If several files are dropped, only the first is used.
-- **Preview state:** the drop zone is replaced by a framed preview (`<img>` from an object URL, max height ~420 px, scrollable, width 100%), the file name and size (`formatBytes`), and **Replace** (opens the file picker) and **Remove** (returns to the empty state) links.
+- **Validation (`validateImage`):** accepted types `image/png`, `image/jpeg`, `image/webp`; max size 10 MB (10 * 1024 * 1024 bytes); zero-byte files rejected. A rejected file shows an inline error and leaves the current state (empty or existing preview) unchanged. If several files are dropped, only the first is used. Because the type comes from the file extension, an accepted file is also decoded before it is shown; if it cannot be decoded the page shows the "couldn't be read" error and leaves the current state unchanged.
+- **Preview state:** the drop zone is replaced by a framed preview (`<img>` from an object URL, max height ~420 px, scrollable, width 100%), the file name and size (`formatBytes`; long names wrap and never push the actions off-screen on phones), and **Replace** (opens the file picker) and **Remove** (returns to the empty state) links.
 - **Cleanup:** the previous object URL is revoked whenever the image is replaced or removed.
 - **Accessibility:** the drop zone is a `<button>`; status/errors are in an `aria-live="polite"` region; focus returns to the drop zone after Remove.
 - **Privacy:** the image is read locally via object URLs only; there is no network request carrying it.
@@ -39,6 +39,7 @@ Plain HTML, CSS and JS in a `web/` folder. No build step, no dependencies. (Vite
 - Wrong type: "That file isn't a PNG, JPEG or WebP image."
 - Too large: "That image is over 10 MB. Try a smaller screenshot."
 - Empty file: "That file is empty."
+- Not decodable as an image: "That image couldn't be read."
 - Clipboard paste with no image: ignored silently (plain-text paste must keep working elsewhere).
 
 ## Running

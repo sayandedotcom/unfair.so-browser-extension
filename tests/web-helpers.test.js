@@ -69,3 +69,7 @@ test('formatBytes: bytes, KB and MB', () => {
 test('formatBytes: just under 1 MB rolls over to MB instead of "1024.0 KB"', () => {
   assert.equal(formatBytes(1024 * 1024 - 1), '1.0 MB');
 });
+
+test('unreadable-image message is the verbatim copy', () => {
+  assert.equal(MESSAGES.unreadable, "That image couldn't be read.");
+});
