@@ -27,4 +27,4 @@ node --test
 - [ ] Close the popup mid-capture, wait ~10 s, reopen: the finished capture is shown; no leftover tabs.
 - [ ] Open DevTools on another tab and capture: still works. (To test `ATTACH_FAILED`, it's enough to confirm the error text is readable if it ever occurs.)
 - [ ] Charts blank in the screenshot? Increase `SETTLE_MS` in `lib.js` (default 1500).
-- [ ] Popup opened for the first time (clear storage via `chrome.storage.local.clear()` in the service-worker console): shows "No capture yet." and no broken image.
+- [ ] Popup opened for the first time (clear storage via `chrome.storage.local.clear()` in the service-worker console): shows "No reading yet…" with the dashed Capture box and no broken image.

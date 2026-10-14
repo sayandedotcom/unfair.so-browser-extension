@@ -7,14 +7,45 @@
   <link rel="stylesheet" href="popup.css">
 </head>
 <body>
-  <h1>X audience analytics</h1>
-  <button id="capture" type="button">Capture</button>
-  <p id="status" role="status" aria-live="polite">No capture yet.</p>
-  <figure id="result" hidden>
-    <div class="frame"><img id="shot" alt="Screenshot of the X audience analytics page"></div>
-    <figcaption id="meta"></figcaption>
-  </figure>
-  <button id="download" type="button" class="secondary" hidden>Download PNG</button>
+  <main class="card">
+    <p id="status" class="lead" role="status" aria-live="polite">No reading yet. Capture your X audience page and it shows up below.</p>
+
+    <h1>Screenshot</h1>
+
+    <div class="banner">
+      <div class="banner-text">
+        <strong>Open your X audience page</strong>
+        <span>Only you can see it — we capture the whole tab.</span>
+      </div>
+      <a id="open" class="open-link" href="https://x.com/i/account_analytics/audience" target="_blank" rel="noopener">
+        open
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M14 4h6v6"/><path d="M20 4l-9 9"/><path d="M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/>
+        </svg>
+      </a>
+    </div>
+
+    <section class="drop">
+      <button id="capture" type="button" class="drop-empty">
+        <svg class="drop-icon" viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="9" cy="9" r="1.6"/><path d="M21 16l-5-5-8 8"/>
+        </svg>
+        <span class="drop-title">Capture your screenshot</span>
+        <span class="drop-hint">click to capture — it opens your page in the background</span>
+      </button>
+
+      <figure id="result" hidden>
+        <div class="frame"><img id="shot" alt="Screenshot of the X audience analytics page"></div>
+        <figcaption>
+          <span id="meta"></span>
+          <span class="actions">
+            <button id="download" type="button" class="link">Download</button>
+            <button id="recapture" type="button" class="link">Recapture</button>
+          </span>
+        </figcaption>
+      </figure>
+    </section>
+  </main>
   <script src="lib.js"></script>
   <script src="popup.js"></script>
 </body>

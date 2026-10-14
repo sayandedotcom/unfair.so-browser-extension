@@ -5,10 +5,20 @@ const els = {
   shot: document.getElementById('shot'),
   meta: document.getElementById('meta'),
   download: document.getElementById('download'),
+  recapture: document.getElementById('recapture'),
+  open: document.getElementById('open'),
 };
 
 let current = null;
 let port = null;
+
+els.open.href = XLib.ANALYTICS_URL;
+
+function setBusy(busy) {
+  els.capture.disabled = busy;
+  els.recapture.disabled = busy;
+  document.body.classList.toggle('busy', busy);
+}
 
 function setStatus(text, isError = false) {
   els.status.textContent = text;
@@ -20,11 +30,11 @@ function show(capture) {
   els.shot.src = capture.dataUrl;
   els.meta.textContent = 'Captured ' + new Date(capture.capturedAt).toLocaleString();
   els.result.hidden = false;
-  els.download.hidden = false;
+  els.capture.hidden = true;
 }
 
 function finish() {
-  els.capture.disabled = false;
+  setBusy(false);
   const p = port;
   port = null;
   try { p && p.disconnect(); } catch { /* already closed */ }
@@ -32,7 +42,7 @@ function finish() {
 
 function startCapture() {
   if (port) return;
-  els.capture.disabled = true;
+  setBusy(true);
   setStatus('Starting…');
   port = chrome.runtime.connect({ name: 'capture' });
   port.onMessage.addListener((msg) => {
@@ -81,7 +91,7 @@ async function syncCapturing() {
   try {
     const { capturing } = await chrome.storage.session.get('capturing');
     if (capturing && !port) {
-      els.capture.disabled = true;
+      setBusy(true);
       setStatus('A capture is in progress…');
     }
   } catch {
@@ -96,10 +106,11 @@ chrome.storage.onChanged.addListener((changes, area) => {
     if (!port) setStatus('Showing your latest capture.');
   }
   if (area === 'session' && changes.capturing && !changes.capturing.newValue && !port) {
-    els.capture.disabled = false;
+    setBusy(false);
   }
 });
 
 els.capture.addEventListener('click', startCapture);
+els.recapture.addEventListener('click', startCapture);
 els.download.addEventListener('click', download);
 loadLastCapture().then(syncCapturing);
