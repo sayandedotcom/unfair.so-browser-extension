@@ -56,29 +56,21 @@ h1 { margin: 0 0 12px; font-size: 18px; font-weight: 650; }
 }
 .open-link:hover { text-decoration: underline; }
 
-.drop {
+.placeholder {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   gap: 4px;
-  width: 100%;
   min-height: 160px;
   padding: 24px;
-  background: transparent;
   border: 1.5px dashed var(--border);
   border-radius: 12px;
-  color: var(--fg);
-  font: inherit;
-  cursor: pointer;
+  text-align: center;
 }
-.drop > * { pointer-events: none; }
-.drop:hover, .drop:focus-visible, .drop.dragging { border-color: var(--accent); }
-.drop:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-.drop.dragging { background: var(--banner); }
-.drop-icon { margin-bottom: 8px; color: var(--accent); }
-.drop-title { font-weight: 600; }
-.drop-hint { color: var(--faint); font-size: 14px; }
+.placeholder-icon { margin-bottom: 8px; color: var(--accent); }
+.placeholder-title { font-weight: 600; }
+.placeholder-hint { color: var(--faint); font-size: 14px; }
 
 figure { margin: 0; }
 .frame {
@@ -87,7 +79,6 @@ figure { margin: 0; }
   border: 1.5px dashed var(--border);
   border-radius: 12px;
 }
-#preview.dragging .frame { border-color: var(--accent); background: var(--banner); }
 .frame img { display: block; width: 100%; height: auto; }
 figcaption {
   display: flex;
@@ -98,18 +89,6 @@ figcaption {
   color: var(--faint);
   font-size: 13px;
 }
-#meta { min-width: 0; overflow-wrap: anywhere; }
-.actions { display: inline-flex; flex-shrink: 0; gap: 14px; }
-button.link {
-  padding: 0;
-  background: none;
-  border: 0;
-  color: var(--accent);
-  font: inherit;
-  font-weight: 600;
-  cursor: pointer;
-}
-button.link:hover { text-decoration: underline; }
 [hidden] { display: none !important; }
 
 @media (max-width: 520px) {

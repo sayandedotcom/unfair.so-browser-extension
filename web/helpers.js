@@ -1,33 +1,26 @@
-// Pure helpers for the screenshot drop page. No DOM access here.
+// Pure helpers for the front-end page. No DOM access here.
 (function (root) {
-  const ALLOWED_TYPES = ['image/png', 'image/jpeg', 'image/webp'];
-  const MAX_BYTES = 10 * 1024 * 1024;
+  const PNG_PREFIX = 'data:image/png;base64,';
 
-  const MESSAGES = {
-    notImage: "That file isn't a PNG, JPEG or WebP image.",
-    tooLarge: 'That image is over 10 MB. Try a smaller screenshot.',
-    empty: 'That file is empty.',
-    unreadable: "That image couldn't be read.",
-  };
-
-  function validateImage(file) {
-    if (!file || !ALLOWED_TYPES.includes(file.type)) return { ok: false, error: MESSAGES.notImage };
-    const size = Number(file.size);
-    if (!Number.isFinite(size) || size <= 0) return { ok: false, error: MESSAGES.empty };
-    if (size > MAX_BYTES) return { ok: false, error: MESSAGES.tooLarge };
-    return { ok: true };
+  // A capture sent by the extension: { dataUrl, capturedAt }. Only base64 PNG data URLs are trusted.
+  function isCapturePayload(capture) {
+    return (
+      !!capture &&
+      typeof capture === 'object' &&
+      typeof capture.dataUrl === 'string' &&
+      capture.dataUrl.startsWith(PNG_PREFIX) &&
+      capture.dataUrl.length > PNG_PREFIX.length &&
+      typeof capture.capturedAt === 'string' &&
+      !Number.isNaN(new Date(capture.capturedAt).getTime())
+    );
   }
 
-  function formatBytes(n) {
-    const v = Number(n);
-    if (!Number.isFinite(v) || v <= 0) return '0 B';
-    if (v < 1024) return `${Math.round(v)} B`;
-    const kb = v / 1024;
-    if (kb < 1023.9) return `${kb.toFixed(1)} KB`;
-    return `${(v / (1024 * 1024)).toFixed(1)} MB`;
+  function formatCapturedAt(iso) {
+    const d = new Date(iso);
+    return Number.isNaN(d.getTime()) ? '' : d.toLocaleString();
   }
 
-  const api = { ALLOWED_TYPES, MAX_BYTES, MESSAGES, validateImage, formatBytes };
+  const api = { isCapturePayload, formatCapturedAt };
 
   if (typeof module === 'object' && module.exports) {
     module.exports = api;
