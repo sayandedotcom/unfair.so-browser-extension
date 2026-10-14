@@ -32,7 +32,7 @@ Already have the folder? Just `cd` into it. Leave the server running and open <h
 **2. Install the extension**
 
 1. Open `chrome://extensions` and turn on **Developer mode** (top right).
-2. Click **Load unpacked** and select the project folder (the one containing `manifest.json`).
+2. Click **Load unpacked** and select the project root: `../unfair.so-browser-extension` (the folder you cloned, directly containing `manifest.json`; not the `web/` subfolder inside it).
 3. Optional: pin **X Audience Screenshot** from the puzzle-piece menu.
 
 **3. Capture**
