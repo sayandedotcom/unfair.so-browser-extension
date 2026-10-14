@@ -2,6 +2,7 @@ importScripts('lib.js');
 
 const {
   ANALYTICS_URL, VIEWPORT, LOAD_TIMEOUT_MS, SETTLE_MS,
+  FRONTEND_URL, FRONTEND_MATCH,
   CaptureError, isLoginUrl, isAnalyticsUrl, computeClip, errorMessage,
 } = self.XLib;
 
@@ -88,6 +89,23 @@ async function captureAudience(report) {
   }
 }
 
+// Shows a finished capture in the front-end page: push it to any open front-end tab and bring it to the
+// front, or open the page (it asks for the latest capture itself once it loads).
+async function showInFrontend(capture) {
+  try {
+    const tabs = await chrome.tabs.query({ url: FRONTEND_MATCH });
+    if (tabs.length === 0) {
+      await chrome.tabs.create({ url: FRONTEND_URL });
+      return;
+    }
+    await Promise.all(tabs.map((tab) => chrome.tabs.sendMessage(tab.id, { type: 'capture', capture }).catch(() => {})));
+    await chrome.tabs.update(tabs[0].id, { active: true });
+    await chrome.windows.update(tabs[0].windowId, { focused: true });
+  } catch {
+    /* front-end unreachable: the popup still has the capture */
+  }
+}
+
 let busy = false;
 
 // Lets a popup that opens mid-capture know one is running. Stale state from a
@@ -120,6 +138,7 @@ chrome.runtime.onConnect.addListener((port) => {
         saved = false;
       }
       post(port, { type: 'done', capture, saved });
+      await showInFrontend(capture);
     } catch (e) {
       const code = e instanceof CaptureError ? e.code : 'CAPTURE_FAILED';
       const detail = e instanceof CaptureError ? e.detail : e && e.message;

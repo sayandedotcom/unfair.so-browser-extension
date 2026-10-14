@@ -31,20 +31,22 @@ node --test
 
 ## Web front-end
 
-A standalone browser page (separate from the extension) where you drop, choose, or paste a screenshot of your X audience page and see it previewed. Nothing is uploaded; it all stays in your browser.
+A browser page (in `web/`) that shows the screenshot as soon as the extension captures it. No backend: the image goes from the extension straight into the page in your browser.
 
 ```
 python3 -m http.server 5173 -d web
 ```
 
-Then open <http://localhost:5173>.
+Keep that running, open <http://localhost:5173>, then click the extension icon and press **Capture**.
 
-- Drop an image on the dashed box, click it to choose a file, or paste with Ctrl/Cmd+V. PNG, JPEG and WebP up to 10 MB.
-- **Replace** and **Remove** appear under the preview.
+- If the page is open, the capture appears there and its tab is brought to the front.
+- If it isn't open, the extension opens it and the page shows the latest capture.
+- To serve it from another address, change `FRONTEND_URL` / `FRONTEND_MATCH` in `lib.js` and the `content_scripts` `matches` in `manifest.json` (a unit test keeps them in sync), then reload the extension.
 
 Checks:
 
 ```
 node --test                      # unit tests
-node tests/browser-check.mjs     # real-browser checks (needs Chrome); screenshots go to $SHOT_DIR
+node tests/browser-check.mjs     # the page in headless Chrome; screenshots go to $SHOT_DIR (default /tmp/web-shots)
+node tests/e2e-check.mjs         # extension -> page, end to end in headless Chrome (X screenshot step stubbed)
 ```

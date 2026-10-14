@@ -107,3 +107,13 @@ test('CaptureError carries code and detail', () => {
   assert.equal(e.detail, 'slow');
   assert.equal(new CaptureError('BUSY').detail, '');
 });
+
+test('front-end URL is covered by FRONTEND_MATCH and by the manifest content script', () => {
+  const { FRONTEND_URL, FRONTEND_MATCH } = require('../lib.js');
+  const manifest = JSON.parse(require('node:fs').readFileSync(require('node:path').join(__dirname, '..', 'manifest.json'), 'utf8'));
+  assert.equal(FRONTEND_URL, 'http://localhost:5173/');
+  assert.ok(FRONTEND_MATCH.includes(FRONTEND_URL + '*'));
+  const script = manifest.content_scripts.find((s) => s.js.includes('content.js'));
+  assert.deepEqual(script.matches, FRONTEND_MATCH);
+  assert.equal(script.run_at, 'document_start');
+});

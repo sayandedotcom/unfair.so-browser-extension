@@ -6,6 +6,9 @@
   const MAX_CAPTURE_HEIGHT = 16000;
   const LOAD_TIMEOUT_MS = 15000;
   const SETTLE_MS = 1500;
+  // The front-end page that displays captures (see web/). The manifest content script must match the same origins.
+  const FRONTEND_URL = 'http://localhost:5173/';
+  const FRONTEND_MATCH = ['http://localhost:5173/*', 'http://127.0.0.1:5173/*'];
 
   const ERROR_MESSAGES = {
     NOT_LOGGED_IN: 'Log in to X in this browser, then try again.',
@@ -75,7 +78,7 @@
 
   const api = {
     ANALYTICS_URL, VIEWPORT, MAX_CAPTURE_HEIGHT, LOAD_TIMEOUT_MS, SETTLE_MS,
-    ERROR_MESSAGES, CaptureError,
+    FRONTEND_URL, FRONTEND_MATCH, ERROR_MESSAGES, CaptureError,
     isLoginUrl, isAnalyticsUrl, computeClip, captureFilename, errorMessage,
   };
 
