@@ -14,6 +14,15 @@ test('isLoginUrl: recognises X login flows', () => {
   assert.equal(isLoginUrl('https://x.com/login'), true);
 });
 
+test('isLoginUrl: recognises the onboarding/login redirect X actually uses when logged out', () => {
+  // Observed from a real logged-out visit to the analytics URL.
+  assert.equal(
+    isLoginUrl('https://x.com/i/jf/onboarding/web?redirect_after_login=%2Fi%2Faccount_analytics%2Faudience&mode=login'),
+    true,
+  );
+  assert.equal(isLoginUrl('https://x.com/some/page?redirect_after_login=%2Fhome'), true);
+});
+
 test('isLoginUrl: never flags the analytics page or other pages', () => {
   assert.equal(isLoginUrl(ANALYTICS_URL), false);
   assert.equal(isLoginUrl(ANALYTICS_URL + '?ref=login'), false);

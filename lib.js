@@ -35,7 +35,11 @@
 
   function isLoginUrl(url) {
     const u = parseUrl(url);
-    return !!u && /^\/(i\/flow\/login|login)(\/|$)/.test(u.pathname);
+    return (
+      !!u &&
+      (/^\/(i\/flow\/login|i\/jf\/onboarding|login)(\/|$)/.test(u.pathname) ||
+        u.searchParams.has('redirect_after_login'))
+    );
   }
 
   function isAnalyticsUrl(url) {
