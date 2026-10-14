@@ -103,6 +103,7 @@ figcaption { display: flex; align-items: center; justify-content: space-between;
 button.link { padding: 0; background: none; border: 0; color: var(--accent); font: inherit; font-weight: 600; cursor: pointer; }
 button.link:hover:not(:disabled) { text-decoration: underline; }
 button.link:disabled { color: var(--faint); cursor: progress; }
+.actions { display: inline-flex; gap: 14px; }
 [hidden] { display: none !important; }
 
 @media (max-width: 520px) {

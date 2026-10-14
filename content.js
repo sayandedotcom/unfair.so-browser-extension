@@ -42,6 +42,10 @@ window.addEventListener('message', async (event) => {
     startCapture();
     return;
   }
+  if (data.type === 'clear-capture') {
+    chrome.storage.local.remove('lastCapture').catch(() => {});
+    return;
+  }
   if (data.type !== 'request-capture') return;
   try {
     const { lastCapture } = await chrome.storage.local.get('lastCapture');
