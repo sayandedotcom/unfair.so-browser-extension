@@ -64,10 +64,18 @@ h1 { margin: 0 0 12px; font-size: 18px; font-weight: 650; }
   gap: 4px;
   min-height: 160px;
   padding: 24px;
+  width: 100%;
+  background: transparent;
   border: 1.5px dashed var(--border);
   border-radius: 12px;
+  color: var(--fg);
+  font: inherit;
   text-align: center;
+  cursor: pointer;
 }
+.placeholder:hover:not(:disabled), .placeholder:focus-visible { border-color: var(--accent); }
+.placeholder:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.placeholder:disabled { cursor: progress; }
 .placeholder-icon { margin-bottom: 8px; color: var(--accent); }
 .placeholder-title { font-weight: 600; }
 .placeholder-hint { color: var(--faint); font-size: 14px; }
@@ -89,6 +97,10 @@ figcaption {
   color: var(--faint);
   font-size: 13px;
 }
+figcaption { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+button.link { padding: 0; background: none; border: 0; color: var(--accent); font: inherit; font-weight: 600; cursor: pointer; }
+button.link:hover:not(:disabled) { text-decoration: underline; }
+button.link:disabled { color: var(--faint); cursor: progress; }
 [hidden] { display: none !important; }
 
 @media (max-width: 520px) {

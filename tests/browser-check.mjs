@@ -81,7 +81,7 @@ function check(name, ok, detail = '') {
 }
 
 // --- checks --------------------------------------------------------------
-const LEAD_EMPTY = 'Waiting for your capture. Click the extension icon and press Capture.';
+const LEAD_EMPTY = 'Waiting for your capture. Press Capture, or use the extension icon.';
 const LEAD_READY = 'Latest capture from your X audience page.';
 
 async function pageChecks() {

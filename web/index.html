@@ -8,7 +8,7 @@
 </head>
 <body>
   <main class="card">
-    <p id="status" class="lead" role="status" aria-live="polite">Waiting for your capture. Click the extension icon and press Capture.</p>
+    <p id="status" class="lead" role="status" aria-live="polite">Waiting for your capture. Press Capture, or use the extension icon.</p>
 
     <h1>Screenshot</h1>
 
@@ -25,17 +25,17 @@
       </a>
     </div>
 
-    <div id="placeholder" class="placeholder">
+    <button id="placeholder" type="button" class="placeholder">
       <svg class="placeholder-icon" viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
         <rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="9" cy="9" r="1.6"/><path d="M21 16l-5-5-8 8"/>
       </svg>
-      <span class="placeholder-title">Your screenshot will appear here</span>
-      <span class="placeholder-hint">click the extension icon and press Capture</span>
-    </div>
+      <span class="placeholder-title">Capture your screenshot</span>
+      <span class="placeholder-hint">click here, or use the extension icon</span>
+    </button>
 
     <figure id="preview" hidden>
       <div class="frame"><img id="shot" alt="Screenshot of your X audience page"></div>
-      <figcaption><span id="meta"></span></figcaption>
+      <figcaption><span id="meta"></span><button id="recapture" type="button" class="link">Recapture</button></figcaption>
     </figure>
   </main>
   <script src="helpers.js"></script>
