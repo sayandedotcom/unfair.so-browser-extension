@@ -3,7 +3,7 @@
   "name": "X Audience Screenshot",
   "version": "0.1.0",
   "description": "Screenshot your X audience analytics page and view it in the popup.",
-  "permissions": ["tabs", "debugger", "storage"],
+  "permissions": ["tabs", "debugger", "storage", "unlimitedStorage"],
   "host_permissions": ["https://x.com/*"],
   "background": { "service_worker": "background.js" },
   "action": {

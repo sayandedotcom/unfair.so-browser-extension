@@ -90,6 +90,11 @@ async function captureAudience(report) {
 
 let busy = false;
 
+// Lets a popup that opens mid-capture know one is running. Stale state from a
+// worker that died mid-capture is cleared on every worker start.
+const setCapturing = (value) => chrome.storage.session.set({ capturing: value }).catch(() => {});
+setCapturing(false);
+
 function post(port, message) {
   try { port.postMessage(message); } catch { /* popup closed; result is still saved */ }
 }
@@ -103,17 +108,25 @@ chrome.runtime.onConnect.addListener((port) => {
       return;
     }
     busy = true;
+    await setCapturing(true);
     try {
       const dataUrl = await captureAudience((text) => post(port, { type: 'status', text }));
       const capture = { dataUrl, capturedAt: new Date().toISOString() };
-      await chrome.storage.local.set({ lastCapture: capture });
-      post(port, { type: 'done', capture });
+      // A failed save must not discard a capture that succeeded.
+      let saved = true;
+      try {
+        await chrome.storage.local.set({ lastCapture: capture });
+      } catch {
+        saved = false;
+      }
+      post(port, { type: 'done', capture, saved });
     } catch (e) {
       const code = e instanceof CaptureError ? e.code : 'CAPTURE_FAILED';
       const detail = e instanceof CaptureError ? e.detail : e && e.message;
       post(port, { type: 'error', code, message: errorMessage(code, detail) });
     } finally {
       busy = false;
+      await setCapturing(false);
     }
   });
 });

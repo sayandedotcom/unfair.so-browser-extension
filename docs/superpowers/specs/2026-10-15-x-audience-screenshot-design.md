@@ -13,7 +13,7 @@ Debugger-based capture in a background tab (chosen over `captureVisibleTab` in a
 ## Files
 | File | Responsibility |
 |---|---|
-| `manifest.json` | MV3 manifest. Permissions: `tabs`, `debugger`, `storage`. Host permission: `https://x.com/*`. Action popup: `popup.html`. Service worker: `background.js`. |
+| `manifest.json` | MV3 manifest. Permissions: `tabs`, `debugger`, `storage`, `unlimitedStorage`. Host permission: `https://x.com/*`. Action popup: `popup.html`. Service worker: `background.js`. |
 | `background.js` | Service worker. Owns the capture flow; receives `capture` message from popup; returns result. |
 | `lib.js` | Pure helpers (e.g. `isLoginUrl(url)`), shared by background (via `importScripts`) and unit-testable in Node. |
 | `popup.html` / `popup.css` / `popup.js` | UI: Capture button, status line, screenshot preview, Download PNG button. |

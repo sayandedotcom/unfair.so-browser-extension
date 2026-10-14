@@ -40,7 +40,7 @@ function startCapture() {
       setStatus(msg.text);
     } else if (msg.type === 'done') {
       show(msg.capture);
-      setStatus('Done.');
+      setStatus(msg.saved === false ? 'Done, but this capture could not be saved for later.' : 'Done.');
       finish();
     } else if (msg.type === 'error') {
       setStatus(msg.message, true);
@@ -75,6 +75,31 @@ async function loadLastCapture() {
   }
 }
 
+// A popup opened mid-capture has no port to the running capture, so it follows
+// the worker's `capturing` flag and picks up the result from storage.
+async function syncCapturing() {
+  try {
+    const { capturing } = await chrome.storage.session.get('capturing');
+    if (capturing && !port) {
+      els.capture.disabled = true;
+      setStatus('A capture is in progress…');
+    }
+  } catch {
+    /* session storage unavailable: behave as if idle */
+  }
+}
+
+chrome.storage.onChanged.addListener((changes, area) => {
+  const latest = area === 'local' && changes.lastCapture && changes.lastCapture.newValue;
+  if (latest && latest.dataUrl) {
+    show(latest);
+    if (!port) setStatus('Showing your latest capture.');
+  }
+  if (area === 'session' && changes.capturing && !changes.capturing.newValue && !port) {
+    els.capture.disabled = false;
+  }
+});
+
 els.capture.addEventListener('click', startCapture);
 els.download.addEventListener('click', download);
-loadLastCapture();
+loadLastCapture().then(syncCapturing);
