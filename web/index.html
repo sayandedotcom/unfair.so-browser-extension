@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Send a screenshot</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main class="card">
+    <p id="status" class="lead" role="status" aria-live="polite">No screenshot yet. Screenshot your X audience page and drop it here.</p>
+
+    <h1>Send a screenshot</h1>
+
+    <div class="banner">
+      <div class="banner-text">
+        <strong>Open your X audience page</strong>
+        <span>Only you can see it — screenshot the whole tab and we do the rest.</span>
+      </div>
+      <a class="open-link" href="https://x.com/i/account_analytics/audience" target="_blank" rel="noopener">
+        open
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M14 4h6v6"/><path d="M20 4l-9 9"/><path d="M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/>
+        </svg>
+      </a>
+    </div>
+
+    <input id="file" type="file" accept="image/png,image/jpeg,image/webp" hidden>
+
+    <button id="drop" type="button" class="drop">
+      <svg class="drop-icon" viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="9" cy="9" r="1.6"/><path d="M21 16l-5-5-8 8"/>
+      </svg>
+      <span class="drop-title">Drop your screenshot</span>
+      <span class="drop-hint">or click to choose — paste works too</span>
+    </button>
+
+    <figure id="preview" hidden>
+      <div class="frame"><img id="shot" alt="Your X audience screenshot"></div>
+      <figcaption>
+        <span id="meta"></span>
+        <span class="actions">
+          <button id="replace" type="button" class="link">Replace</button>
+          <button id="remove" type="button" class="link">Remove</button>
+        </span>
+      </figcaption>
+    </figure>
+  </main>
+  <script src="helpers.js"></script>
+</body>
+</html>
